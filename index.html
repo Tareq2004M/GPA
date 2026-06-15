@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بوابة الطالب الذكية - حساب المعدل التراكمي (مزامنة فورية)</title>
+    <title>بوابة الطالب الذكية - حساب المعدل التراكمي </title>
     
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 
-    <!-- تضمين مكتبات Firebase (اصدار الـ الويب التقليدي للسهولة) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -22,12 +21,11 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
 
-    <!-- واجهة التسجيل الإجبارية عند الدخول لأول مرة -->
     <div id="login-overlay" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center z-50 transition-all duration-500">
         <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 border border-slate-100 text-center">
             <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">🎓</div>
             <h2 class="text-2xl font-black text-slate-900 mb-2">مرحباً بك في بوابة الطالب</h2>
-            <p class="text-slate-500 text-sm mb-6">يرجى تسجيل الدخول أولاً للوصول للمنصة والمزامنة الفورية.</p>
+            <p class="text-slate-500 text-sm mb-6">يرجى تسجيل الدخول أولاً للوصول للمنصة.</p>
             
             <div class="space-y-4 text-right mb-6">
                 <div>
@@ -153,7 +151,6 @@
     </footer>
 
     <script>
-        // إعدادات Firebase - استبدلها ببيانات مشروعك الخاصة من Firebase Console
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -197,15 +194,14 @@
             return checkedRadio ? checkedRadio.value : '5';
         }
 
-        // دالة الفحص الإجباري فور فتح الموقع لمنع عرض أي محتوى قبل التسجيل
         function enforceLoginCheck() {
             const profileExists = localStorage.getItem('student_profile');
             const overlay = document.getElementById('login-overlay');
             
             if (!profileExists) {
-                overlay.classList.remove('hidden-force'); // بقاء النافذة لحجب الموقع
+                overlay.classList.remove('hidden-force'); 
             } else {
-                overlay.classList.add('hidden-force'); // إخفاء النافذة والسماح بالدخول
+                overlay.classList.add('hidden-force'); 
                 displayWelcomeBanner();
             }
         }
@@ -262,12 +258,10 @@
             dbRef.set(data);
         }
 
-        // تشغيل الفحص الإجباري بمجرد تحميل المتصفح وعناصر الـ DOM الأساسية
         document.addEventListener("DOMContentLoaded", () => {
             enforceLoginCheck();
         });
 
-        // مزامنة البيانات السحابية فور التغيير
         dbRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (!data) {
