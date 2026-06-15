@@ -149,30 +149,30 @@
     </footer>
 
     <script>
-        // مصفوفة الدرجات والنقاط الرسمية المتوافقة تماماً مع بوابات الجامعات الحكومية لنظام 5
+        // تحديث مصفوفة نظام الـ 5 نقاط بناءً على تقسيم الدرجات والرموز الجديد المطلوب
         const grades5 = [
-            {text: 'أ+ / ممتاز مرتفع (5.00)', val: '5.00'}, 
-            {text: 'أ / ممتاز (4.75)', val: '4.75'}, 
-            {text: 'ب+ / جيد جداً مرتفع (4.50)', val: '4.50'}, 
-            {text: 'ب / جيد جداً (4.00)', val: '4.00'}, 
-            {text: 'ج+ / جيد مرتفع (3.50)', val: '3.50'}, 
-            {text: 'ج / جيد (3.00)', val: '3.00'}, 
-            {text: 'د+ / مقبول مرتفع (2.50)', val: '2.50'}, 
-            {text: 'د / مقبول (2.00)', val: '2.00'}, 
-            {text: 'هـ / راسب (0.00)', val: '0.00'}
+            {text: 'A+ / من 95 إلى 100 (5.00)', val: '5.00'}, 
+            {text: 'A / من 90 إلى 94 (4.75)', val: '4.75'}, 
+            {text: 'B+ / من 85 إلى 89 (4.50)', val: '4.50'}, 
+            {text: 'B / من 80 إلى 84 (4.00)', val: '4.00'}, 
+            {text: 'C+ / من 75 إلى 79 (3.50)', val: '3.50'}, 
+            {text: 'C / من 70 إلى 74 (3.00)', val: '3.00'}, 
+            {text: 'D+ / من 65 إلى 69 (2.50)', val: '2.50'}, 
+            {text: 'D / من 60 إلى 64 (2.00)', val: '2.00'}, 
+            {text: 'F / أقل من 60 (0.00)', val: '0.00'}
         ];
 
-        // مصفوفة نظام الـ 4 نقاط
+        // تحديث مصفوفة نظام الـ 4 نقاط بالتوافق مع النطاقات الجديدة المحددة
         const grades4 = [
-            {text: 'A+ (4.00)', val: '4.00'}, 
-            {text: 'A (3.75)', val: '3.75'}, 
-            {text: 'B+ (3.50)', val: '3.50'}, 
-            {text: 'B (3.00)', val: '3.00'}, 
-            {text: 'C+ (2.50)', val: '2.50'}, 
-            {text: 'C (2.00)', val: '2.00'}, 
-            {text: 'D+ (1.50)', val: '1.50'}, 
-            {text: 'D (1.00)', val: '1.00'}, 
-            {text: 'F (0.00)', val: '0.00'}
+            {text: 'A+ / من 95 إلى 100 (4.00)', val: '4.00'}, 
+            {text: 'A / من 90 إلى 94 (3.75)', val: '3.75'}, 
+            {text: 'B+ / من 85 إلى 89 (3.50)', val: '3.50'}, 
+            {text: 'B / من 80 إلى 84 (3.00)', val: '3.00'}, 
+            {text: 'C+ / من 75 إلى 79 (2.50)', val: '2.50'}, 
+            {text: 'C / من 70 إلى 74 (2.00)', val: '2.00'}, 
+            {text: 'D+ / من 65 إلى 69 (1.50)', val: '1.50'}, 
+            {text: 'D / من 60 إلى 64 (1.00)', val: '1.00'}, 
+            {text: 'F / أقل من 60 (0.00)', val: '0.00'}
         ];
 
         function getSystem() {
@@ -343,7 +343,6 @@
             prev_gpa = float(prev_gpa_input) if prev_gpa_input else 0.0
             prev_hours = int(prev_hours_input) if prev_hours_input else 0
             
-            # 📌 مطابقة آلية عمادة القبول والتسجيل الرسمية: نقاط السجل السابق = الساعات السابقة × المعدل السابق دون تقريب وسيط
             prev_total_points = prev_gpa * prev_hours
 
             grade_selects = document.querySelectorAll('.course-grade')
@@ -362,7 +361,6 @@
 
             current_term_gpa = (term_points / term_hours) if term_hours > 0 else 0.0
             
-            # حساب المجاميع الكلية النهائية
             grand_total_hours = prev_hours + term_hours
             grand_total_points = prev_total_points + term_points
             
@@ -382,7 +380,6 @@
                 elif final_cumulative_gpa >= 1.00: status = "مقبول"
                 else: status = "ضعيف "
 
-            # عرض المخرجات بدقة 100% وبثلاث خانات عشرية كاملة
             document.getElementById('gpa-result').innerText = f"{final_cumulative_gpa:.3f}"
             document.getElementById('term-gpa').innerText = f"{current_term_gpa:.3f}"
             document.getElementById('total-hours').innerText = str(grand_total_hours)
