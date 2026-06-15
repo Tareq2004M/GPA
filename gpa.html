@@ -3,95 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حاسبة المعدل الأكاديمي الذكية (بايثون + جيت هب)</title>
+    <title>بوابة الطالب الذكية - حساب المعدل التراكمي</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght=400;500;700;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 
     <style>
         body { font-family: 'Tajawal', sans-serif; }
+        .hidden-force { display: none !important; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
 
+    <div id="login-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 transition-all duration-500 hidden-force">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 border border-slate-100 text-center">
+            <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">🎓</div>
+            <h2 class="text-2xl font-black text-slate-900 mb-2">مرحباً بك في بوابة الطالب</h2>
+            <p class="text-slate-500 text-sm mb-6">مستشارك الأكاديمي لحساب معدلك التراكمي بدقة متناهية وبدون فقدان لبياناتك.</p>
+            
+            <div class="space-y-4 text-right mb-6">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">اسمك الأكاديمي:</label>
+                    <input type="text" id="user-name" placeholder="مثال: أحمد عبد الله" class="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">الجامعة / الكلية:</label>
+                    <input type="text" id="user-uni" placeholder="مثال: جامعة الملك سعود" class="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 font-medium">
+                </div>
+            </div>
+            <button onclick="handleLoginSubmit()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md transition duration-200">
+                الدخول للمنصة الذكية 🚀
+            </button>
+        </div>
+    </div>
+
     <header class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-black">منصة الطالب الأكاديمية</h1>
-            <span class="text-xs bg-white/20 px-3 py-1.5 rounded-full font-bold backdrop-blur-sm">مدعوم بـ Python & GitHub</span>
+            <div>
+                <h1 class="text-xl font-black flex items-center gap-2">
+                    <span>🎓</span> بوابة الطالب الأكاديمية
+                </h1>
+                <p id="welcome-banner" class="text-xs text-indigo-100 mt-0.5 font-medium"></p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button onclick="handleLogout()" class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold px-3 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+                    <span>🚪</span> تسجيل الخروج
+                </button>
+                <span class="hidden sm:inline-block text-xs bg-white/20 px-3 py-2 rounded-full font-bold backdrop-blur-sm">تحديث ذكي</span>
+            </div>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-8 flex-grow max-w-4xl">
-        <div class="text-center mb-8">
-            <h2 class="text-3xl font-extrabold text-slate-900 mb-2">الحاسبة الذكية للمعدل التراكمي GPA</h2>
-            <p class="text-slate-600">اختر نظام جامعتك (من 4 أو من 5) واحسب معدلك الفصلي المتوقع بدقة عالية.</p>
-        </div>
-
-        <div class="flex justify-center gap-4 mb-6">
-            <label class="flex items-center gap-2 bg-white px-5 py-3 rounded-xl shadow-xs border border-slate-200 cursor-pointer hover:border-indigo-500 transition">
-                <input type="radio" name="gpa_system" value="5" checked onchange="updateGradesDropdown()" class="w-4 h-4 text-indigo-600">
-                <span class="font-bold text-slate-700">النظام من 5.00</span>
+        
+        <div class="flex justify-center gap-4 mb-8">
+            <label class="flex items-center gap-3 bg-white px-6 py-3.5 rounded-2xl shadow-xs border border-slate-200 cursor-pointer hover:border-indigo-500 transition-all">
+                <input type="radio" name="gpa_system" value="5" checked onchange="onSystemChange()" class="w-4 h-4 text-indigo-600">
+                <span class="font-bold text-slate-700 text-sm">نظام الـ 5.00 نقاط</span>
             </label>
-            <label class="flex items-center gap-2 bg-white px-5 py-3 rounded-xl shadow-xs border border-slate-200 cursor-pointer hover:border-indigo-500 transition">
-                <input type="radio" name="gpa_system" value="4" onchange="updateGradesDropdown()" class="w-4 h-4 text-indigo-600">
-                <span class="font-bold text-slate-700">النظام من 4.00</span>
+            <label class="flex items-center gap-3 bg-white px-6 py-3.5 rounded-2xl shadow-xs border border-slate-200 cursor-pointer hover:border-indigo-500 transition-all">
+                <input type="radio" name="gpa_system" value="4" onchange="onSystemChange()" class="w-4 h-4 text-indigo-600">
+                <span class="font-bold text-slate-700 text-sm">نظام الـ 4.00 نقاط</span>
             </label>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="md:col-span-2 bg-white p-6 rounded-2xl shadow-xs border border-slate-100">
-                <h3 class="text-lg font-bold mb-4 text-slate-700 flex justify-between items-center">
-                    <span>قائمة المواد الدراسية</span>
-                    <button onclick="addCourseRow()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-sm font-bold py-1.5 px-4 rounded-xl transition">
-                        + إضافة مادة
-                    </button>
-                </h3>
-                
-                <div id="courses-list" class="space-y-3">
-                    <div class="course-row grid grid-cols-12 gap-2 items-center bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                        <div class="col-span-5 md:col-span-6">
-                            <input type="text" placeholder="اسم المادة (اختياري)" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
+            
+            <div class="md:col-span-2 space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-100">
+                    <h3 class="text-base font-bold mb-4 text-indigo-600 flex items-center gap-2">
+                        <span>📊</span> السجل الأكاديمي السابق (قبل هذا الترم)
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">المعدل التراكمي السابق:</label>
+                            <input type="number" id="prev-gpa" step="0.01" min="0" max="5" placeholder="0.00" oninput="saveData()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 font-bold">
                         </div>
-                        <div class="col-span-4 md:col-span-3">
-                            <select class="course-grade w-full bg-white border border-slate-300 rounded-lg px-2 py-2 text-sm focus:outline-none focus:border-indigo-500">
-                                </select>
-                        </div>
-                        <div class="col-span-2 md:col-span-2">
-                            <input type="number" min="1" max="8" value="3" class="course-hours w-full bg-white border border-slate-300 rounded-lg px-2 py-2 text-sm text-center focus:outline-none focus:border-indigo-500">
-                        </div>
-                        <div class="col-span-1 text-center">
-                            <button onclick="this.closest('.course-row').remove()" class="text-rose-500 hover:text-rose-700 font-bold text-lg">&times;</button>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">إجمالي الساعات المقطوعة سابقاً:</label>
+                            <input type="number" id="prev-hours" min="0" placeholder="0" oninput="saveData()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 font-bold">
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-6">
-                    <button py-click="python_calculate" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition w-full">
-                        تشغيل خوارزمية بايثون والحساب 🐍
-                    </button>
+                <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                            <span>📚</span> مواد الفصل الحالي
+                        </h3>
+                        <button onclick="addCourseRow()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold py-1.5 px-4 rounded-xl transition">
+                            + إضافة مادة جديدة
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-12 gap-2 px-3 mb-2 text-xs font-bold text-slate-400">
+                        <div class="col-span-5 md:col-span-6">اسم المادة</div>
+                        <div class="col-span-4 md:col-span-3">الدرجة / التقدير</div>
+                        <div class="col-span-2 md:col-span-2 text-center">الساعات</div>
+                        <div class="col-span-1"></div>
+                    </div>
+
+                    <div id="courses-list" class="space-y-3"></div>
+
+                    <div class="mt-6">
+                        <button py-click="python_calculate" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition w-full flex justify-center items-center gap-2">
+                            <span>🐍</span> تشغيل خوارزمية بايثون وحساب التراكمي
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-100 flex flex-col justify-between items-center text-center">
-                <div>
-                    <h3 class="text-lg font-bold text-slate-700 mb-6">المعدل النهائي</h3>
-                    <div class="inline-flex items-center justify-center w-36 h-36 rounded-full bg-indigo-50 border-4 border-indigo-500 text-slate-800 mb-4 shadow-xs">
+            <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-100 flex flex-col justify-between items-center text-center h-fit md:sticky md:top-6">
+                <div class="w-full">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">المعدل التراكمي النهائي</h3>
+                    <div class="inline-flex items-center justify-center w-36 h-36 rounded-full bg-indigo-50/70 border-4 border-indigo-500 text-slate-800 mb-4 shadow-xs">
                         <span id="gpa-result" class="text-4xl font-black text-indigo-600">0.00</span>
                     </div>
                 </div>
                 
-                <div class="w-full bg-slate-50 p-4 rounded-xl border border-slate-100 text-sm text-slate-600 space-y-2">
+                <div class="w-full bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs text-slate-600 space-y-2.5 text-right">
                     <div class="flex justify-between">
-                        <span>إجمالي الساعات:</span>
-                        <span id="total-hours" class="font-bold text-slate-800">0</span>
+                        <span>المعدل الفصلي الحالي:</span>
+                        <span id="term-gpa" class="font-bold text-slate-800 text-sm">0.00</span>
                     </div>
                     <div class="flex justify-between">
-                        <span>التقدير العام:</span>
-                        <span id="gpa-status" class="font-bold text-indigo-600">-</span>
+                        <span>إجمالي الساعات الكلي:</span>
+                        <span id="total-hours" class="font-bold text-slate-800 text-sm">0</span>
+                    </div>
+                    <div class="border-t border-slate-200/80 my-2 pt-2.5 flex justify-between items-center">
+                        <span>التقدير العام النهائي:</span>
+                        <span id="gpa-status" class="font-black text-indigo-600 text-sm">-</span>
                     </div>
                 </div>
             </div>
@@ -99,31 +145,155 @@
     </main>
 
     <footer class="bg-slate-900 text-slate-400 py-4 text-center text-xs">
-        <p>تم التطوير بواسطة خوارزمية Python ومستضاف مجاناً عبر GitHub Pages</p>
+        <p>بوابة الطالب الذكية 🔒 البيانات مشفرة ومحفوظة محلياً في متصفحك</p>
     </footer>
 
     <script>
         const grades5 = [
-            {text: 'A+ (5.00)', val: '5.00'}, {text: 'A (4.75)', val: '4.75'},
-            {text: 'B+ (4.50)', val: '4.50'}, {text: 'B (4.00)', val: '4.00'},
-            {text: 'C+ (3.50)', val: '3.50'}, {text: 'C (3.00)', val: '3.00'},
+            {text: 'A+ (5.00)', val: '5.00'}, {text: 'A (4.75)', val: '4.75'}, {text: 'B+ (4.50)', val: '4.50'}, 
+            {text: 'B (4.00)', val: '4.00'}, {text: 'C+ (3.50)', val: '3.50'}, {text: 'C (3.00)', val: '3.00'}, 
             {text: 'D+ (2.50)', val: '2.50'}, {text: 'D (2.00)', val: '2.00'}, {text: 'F (0.00)', val: '0.00'}
         ];
 
         const grades4 = [
-            {text: 'A (4.00)', val: '4.00'}, {text: 'B+ (3.50)', val: '3.50'},
-            {text: 'B (3.00)', val: '3.00'}, {text: 'C+ (2.50)', val: '2.50'},
-            {text: 'C (2.00)', val: '2.00'}, {text: 'D+ (1.50)', val: '1.50'},
+            {text: 'A (4.00)', val: '4.00'}, {text: 'B+ (3.50)', val: '3.50'}, {text: 'B (3.00)', val: '3.00'}, 
+            {text: 'C+ (2.50)', val: '2.50'}, {text: 'C (2.00)', val: '2.00'}, {text: 'D+ (1.50)', val: '1.50'}, 
             {text: 'D (1.00)', val: '1.00'}, {text: 'F (0.00)', val: '0.00'}
         ];
 
-        function updateGradesDropdown() {
-            const system = document.querySelector('input[name="gpa_system"]:checked').value;
-            const dropdowns = document.querySelectorAll('.course-grade');
+        function getSystem() {
+            return document.querySelector('input[name="gpa_system"]:checked').value;
+        }
+
+        function handleLoginSubmit() {
+            const name = document.getElementById('user-name').value.trim();
+            const uni = document.getElementById('user-uni').value.trim();
+            if(!name) { alert('الرجاء كتابة اسمك لتخصيص المنصة!'); return; }
+            
+            localStorage.setItem('student_profile', JSON.stringify({name, uni}));
+            document.getElementById('login-overlay').classList.add('hidden-force');
+            displayWelcomeBanner();
+            saveData();
+        }
+
+        function handleLogout() {
+            if (confirm("هل أنت متأكد أنك تريد تسجيل الخروج؟ سيتم مسح بياناتك وموادك المخزنة محلياً.")) {
+                localStorage.removeItem('student_profile');
+                localStorage.removeItem('gpa_v3_permanent');
+                window.location.reload();
+            }
+        }
+
+        function displayWelcomeBanner() {
+            const profileRaw = localStorage.getItem('student_profile');
+            if(profileRaw) {
+                const profile = JSON.parse(profileRaw);
+                document.getElementById('welcome-banner').innerText = `أهلاً بك يا ${profile.name} | ${profile.uni || 'المنصة الأكاديمية'}`;
+            }
+        }
+
+        function saveData() {
+            const data = {
+                system: getSystem(),
+                prevGpa: document.getElementById('prev-gpa').value,
+                prevHours: document.getElementById('prev-hours').value,
+                resCumulativeGpa: document.getElementById('gpa-result').innerText,
+                resTermGpa: document.getElementById('term-gpa').innerText,
+                resTotalHours: document.getElementById('total-hours').innerText,
+                resStatus: document.getElementById('gpa-status').innerText,
+                courses: []
+            };
+
+            document.querySelectorAll('.course-row').forEach(row => {
+                data.courses.push({
+                    name: row.querySelector('.course-name').value,
+                    grade: row.querySelector('.course-grade').value,
+                    hours: row.querySelector('.course-hours').value
+                });
+            });
+
+            localStorage.setItem('gpa_v3_permanent', JSON.stringify(data));
+        }
+
+        function checkLoginAndLoad() {
+            const profileExists = localStorage.getItem('student_profile');
+            const overlay = document.getElementById('login-overlay');
+            
+            if (!profileExists) {
+                overlay.classList.remove('hidden-force');
+            } else {
+                overlay.classList.add('hidden-force');
+                displayWelcomeBanner();
+            }
+
+            const rawData = localStorage.getItem('gpa_v3_permanent');
+            if (!rawData) {
+                addCourseRow();
+                return;
+            }
+            const data = JSON.parse(rawData);
+            
+            document.querySelectorAll('input[name="gpa_system"]').forEach(el => {
+                el.checked = el.value === data.system;
+            });
+
+            document.getElementById('prev-gpa').value = data.prevGpa || '';
+            document.getElementById('prev-hours').value = data.prevHours || '';
+            
+            document.getElementById('gpa-result').innerText = data.resCumulativeGpa || '0.00';
+            document.getElementById('term-gpa').innerText = data.resTermGpa || '0.00';
+            document.getElementById('total-hours').innerText = data.resTotalHours || '0';
+            document.getElementById('gpa-status').innerText = data.resStatus || '-';
+
+            const list = document.getElementById('courses-list');
+            list.innerHTML = '';
+
+            if(data.courses && data.courses.length > 0) {
+                data.courses.forEach(c => addCourseRow(c.name, c.grade, c.hours));
+            } else {
+                addCourseRow();
+            }
+        }
+
+        function addCourseRow(name='', grade='', hours='3') {
+            const list = document.getElementById('courses-list');
+            const row = document.createElement('div');
+            row.className = "course-row grid grid-cols-12 gap-2 items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200/60 transition-all hover:bg-slate-100/50";
+            
+            const system = getSystem();
+            const targetGrades = system === '5' ? grades5 : grades4;
+            
+            let optionsHTML = '';
+            targetGrades.forEach(g => {
+                const isSelected = (grade && g.val === grade) ? 'selected' : '';
+                optionsHTML += `<option value="${g.val}" ${isSelected}>${g.text}</option>`;
+            });
+
+            row.innerHTML = `
+                <div class="col-span-5 md:col-span-6">
+                    <input type="text" value="${name}" placeholder="مثال: رياضيات" oninput="saveData()" class="course-name w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500 font-medium">
+                </div>
+                <div class="col-span-4 md:col-span-3">
+                    <select onchange="saveData()" class="course-grade w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-indigo-500 font-medium">
+                        ${optionsHTML}
+                    </select>
+                </div>
+                <div class="col-span-2 md:col-span-2">
+                    <input type="number" value="${hours}" min="1" max="8" oninput="saveData()" class="course-hours w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:border-indigo-500 font-bold">
+                </div>
+                <div class="col-span-1 text-center">
+                    <button onclick="this.closest('.course-row').remove(); saveData();" class="text-rose-400 hover:text-rose-600 font-bold text-base transition">&times;</button>
+                </div>
+            `;
+            list.appendChild(row);
+        }
+
+        function onSystemChange() {
+            const system = getSystem();
             const targetGrades = system === '5' ? grades5 : grades4;
 
-            dropdowns.forEach(select => {
-                const currentVal = select.value;
+            document.querySelectorAll('.course-row').forEach(row => {
+                const select = row.querySelector('.course-grade');
                 select.innerHTML = '';
                 targetGrades.forEach(g => {
                     const opt = document.createElement('option');
@@ -132,76 +302,78 @@
                     select.appendChild(opt);
                 });
             });
+            saveData();
         }
 
-        function addCourseRow() {
-            const list = document.getElementById('courses-list');
-            const firstRow = document.querySelector('.course-row');
-            const newRow = firstRow.cloneNode(true);
-            newRow.querySelector('input[type="text"]').value = '';
-            list.appendChild(newRow);
-            updateGradesDropdown();
+        window.onload = () => { checkLoginAndLoad(); };
+        
+        function savePythonResults() {
+            saveData();
         }
-
-        // تشغيل أولي عند تحميل الصفحة
-        window.onload = () => { updateGradesDropdown(); };
     </script>
 
     <script type="py">
         from pyscript import document
+        from js import savePythonResults
 
         def python_calculate(event):
-            # 1. معرفة النظام المختار (4 أو 5)
             system_elements = document.querySelectorAll('input[name="gpa_system"]')
             gpa_system = 5
             for el in system_elements:
                 if el.checked:
                     gpa_system = int(el.value)
 
-            # 2. جلب صفوف المواد من الواجهة
-            grade_elements = document.querySelectorAll('.course-grade')
-            hours_elements = document.querySelectorAll('.course-hours')
+            prev_gpa_input = document.getElementById('prev-gpa').value
+            prev_hours_input = document.getElementById('prev-hours').value
 
-            total_points = 0.0
-            total_hours = 0
+            prev_gpa = float(prev_gpa_input) if prev_gpa_input else 0.0
+            prev_hours = int(prev_hours_input) if prev_hours_input else 0
+            prev_total_points = prev_gpa * prev_hours
 
-            # 3. الخوارزمية الرياضية للحساب
-            for i in range(len(grade_elements)):
-                grade_val = float(grade_elements[i].value)
-                hours_val = int(hours_elements[i].value)
+            grade_selects = document.querySelectorAll('.course-grade')
+            hours_inputs = document.querySelectorAll('.course-hours')
+
+            term_points = 0.0
+            term_hours = 0
+
+            for i in range(len(grade_selects)):
+                grade_val = float(grade_selects[i].value)
+                hours_val = int(hours_inputs[i].value) if hours_inputs[i].value else 0
                 
                 if hours_val > 0:
-                    total_points += (grade_val * hours_val)
-                    total_hours += hours_val
+                    term_points += (grade_val * hours_val)
+                    term_hours += hours_val
 
-            if total_hours == 0:
-                return
+            current_term_gpa = (term_points / term_hours) if term_hours > 0 else 0.0
+            
+            grand_total_hours = prev_hours + term_hours
+            grand_total_points = prev_total_points + term_points
+            
+            final_cumulative_gpa = (grand_total_points / grand_total_hours) if grand_total_hours > 0 else 0.0
 
-            # حساب المعدل النهائي وتقريبه لخانة ثنائية
-            final_gpa = round(total_points / total_hours, 2)
-
-            # 4. تحديد التقدير العام بناءً على النظام المختار
             status = "-"
+            # 📌 تطبيق شروط التصنيف المدخلة بدقة هندسية
             if gpa_system == 5:
-                if final_gpa >= 4.5: status = "ممتاز مرتفع 🌟"
-                elif final_gpa >= 4.0: status = "ممتاز 👍"
-                elif final_gpa >= 3.5: status = "جيد جداً مرتفع"
-                elif final_gpa >= 3.0: status = "جيد جداً"
-                elif final_gpa >= 2.5: status = "جيد مرتفع"
-                elif final_gpa >= 2.0: status = "جيد"
+                if final_cumulative_gpa >= 4.75: status = "ممتاز مرتفع 🌟"
+                elif final_cumulative_gpa >= 4.50: status = "ممتاز 👍"
+                elif final_cumulative_gpa >= 3.75: status = "جيد جداً"
+                elif final_cumulative_gpa >= 2.75: status = "جيد"
+                elif final_cumulative_gpa >= 2.00: status = "مقبول"
                 else: status = "ضعيف 🔍"
-            else: # النظام من 4
-                if final_gpa >= 3.75: status = "ممتاز مرتفع 🌟"
-                elif final_gpa >= 3.5: status = "ممتاز 👍"
-                elif final_gpa >= 3.0: status = "جيد جداً"
-                elif final_gpa >= 2.5: status = "جيد"
-                elif final_gpa >= 2.0: status = "مقبول"
+            else: # نظام الـ 4 نقاط
+                if final_cumulative_gpa >= 3.75: status = "ممتاز مرتفع 🌟"
+                elif final_cumulative_gpa >= 3.50: status = "ممتاز 👍"
+                elif final_cumulative_gpa >= 2.75: status = "جيد جداً"
+                elif final_cumulative_gpa >= 2.00: status = "جيد"
+                elif final_cumulative_gpa >= 1.00: status = "مقبول"
                 else: status = "ضعيف 🔍"
 
-            # 5. تحديث واجهة المستخدم بالنتائج المستخرجة من بايثون
-            document.getElementById('gpa-result').innerText = f"{final_gpa:.2f}"
-            document.getElementById('total-hours').innerText = str(total_hours)
+            document.getElementById('gpa-result').innerText = f"{final_cumulative_gpa:.2f}"
+            document.getElementById('term-gpa').innerText = f"{current_term_gpa:.2f}"
+            document.getElementById('total-hours').innerText = str(grand_total_hours)
             document.getElementById('gpa-status').innerText = status
+            
+            savePythonResults()
     </script>
 
 </body>
