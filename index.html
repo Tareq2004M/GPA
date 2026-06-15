@@ -271,7 +271,7 @@
 
             row.innerHTML = `
                 <div class="col-span-5 md:col-span-6">
-                    <input type="text" value="${name}" placeholder="مثال: رياضيات" oninput="saveData()" class="course-name w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500 font-medium">
+                    <input type="text" value="${name}" placeholder="" oninput="saveData()" class="course-name w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500 font-medium">
                 </div>
                 <div class="col-span-4 md:col-span-3">
                     <select onchange="saveData()" class="course-grade w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-indigo-500 font-medium">
@@ -352,7 +352,6 @@
             final_cumulative_gpa = (grand_total_points / grand_total_hours) if grand_total_hours > 0 else 0.0
 
             status = "-"
-            # 📌 تطبيق شروط التصنيف المدخلة بدقة هندسية
             if gpa_system == 5:
                 if final_cumulative_gpa >= 4.75: status = "ممتاز مرتفع 🌟"
                 elif final_cumulative_gpa >= 4.50: status = "ممتاز 👍"
@@ -360,7 +359,7 @@
                 elif final_cumulative_gpa >= 2.75: status = "جيد"
                 elif final_cumulative_gpa >= 2.00: status = "مقبول"
                 else: status = "ضعيف 🔍"
-            else: # نظام الـ 4 نقاط
+            else: 
                 if final_cumulative_gpa >= 3.75: status = "ممتاز مرتفع 🌟"
                 elif final_cumulative_gpa >= 3.50: status = "ممتاز 👍"
                 elif final_cumulative_gpa >= 2.75: status = "جيد جداً"
