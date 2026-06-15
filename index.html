@@ -16,11 +16,13 @@
         body { font-family: 'Tajawal', sans-serif; }
         .hidden-force { display: none !important; }
         
-        /* 🌐 إجبار حقول الأرقام والعدادات على الظهور بالإنجليزية ومن اليسار لليمين */
         input[type="number"] {
-            font-variant-numeric: lnum !important;
+            font-variant-numeric: lining-nums !important;
+            -webkit-font-feature-settings: "lnum" !important;
+            font-feature-settings: "lnum" !important;
             direction: ltr !important;
-            text-align: center;
+            text-align: right;
+            padding-left: 8px;
         }
     </style>
 </head>
