@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بوابة الطالب الذكية - حساب المعدل التراكمي (معتمد)</title>
+    <title>بوابة الطالب الذكية - حساب المعدل التراكمي (مزامنة فورية)</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght=400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2=family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <style>
         body { font-family: 'Tajawal', sans-serif; }
@@ -23,7 +25,7 @@
         <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 border border-slate-100 text-center">
             <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">🎓</div>
             <h2 class="text-2xl font-black text-slate-900 mb-2">مرحباً بك في بوابة الطالب</h2>
-            <p class="text-slate-500 text-sm mb-6">المستشار الأكاديمي المعتمد لحساب معدلك التراكمي بأعلى دقة.</p>
+            <p class="text-slate-500 text-sm mb-6">المستشار الأكاديمي المعتمد لحساب معدلك التراكمي بأعلى دقة بمزامنة حية.</p>
             
             <div class="space-y-4 text-right mb-6">
                 <div>
@@ -45,7 +47,7 @@
         <div class="container mx-auto flex justify-between items-center">
             <div>
                 <h1 class="text-xl font-black flex items-center gap-2">
-                    <span>🎓</span> حساب المعدل التراكمي الدقيق
+                    <span>🎓</span> حساب المعدل التراكمي المشترك
                 </h1>
                 <p id="welcome-banner" class="text-xs text-indigo-100 mt-0.5 font-medium"></p>
             </div>
@@ -54,7 +56,7 @@
                 <button onclick="handleLogout()" class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold px-3 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer">
                     <span>🚪</span> تسجيل الخروج
                 </button>
-                <span class="hidden sm:inline-block text-xs bg-white/20 px-3 py-2 rounded-full font-bold backdrop-blur-sm">نظام كليات الجامعة</span>
+                <span class="hidden sm:inline-block text-xs bg-white/20 px-3 py-2 rounded-full font-bold backdrop-blur-sm">تحديث فوري نشط ⚡</span>
             </div>
         </div>
     </header>
@@ -82,11 +84,11 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1.5">المعدل التراكمي السابق:</label>
-                            <input type="number" id="prev-gpa" step="0.001" min="0" max="5" placeholder="3.096" oninput="saveData()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 font-bold">
+                            <input type="number" id="prev-gpa" step="0.001" min="0" max="5" placeholder="3.096" oninput="saveDataToServer()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 font-bold">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1.5">إجمالي الساعات المسجلة سابقاً:</label>
-                            <input type="number" id="prev-hours" min="0" placeholder="مثال: 60" oninput="saveData()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 font-bold">
+                            <input type="number" id="prev-hours" min="0" placeholder="مثال: 60" oninput="saveDataToServer()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 font-bold">
                         </div>
                     </div>
                 </div>
@@ -96,7 +98,7 @@
                         <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
                             <span>📚</span> درجات ومواد الفصل الحالي
                         </h3>
-                        <button onclick="addCourseRow()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold py-1.5 px-4 rounded-xl transition">
+                        <button onclick="addCourseRow(); saveDataToServer();" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold py-1.5 px-4 rounded-xl transition">
                             + إضافة مادة
                         </button>
                     </div>
@@ -145,11 +147,24 @@
     </main>
 
     <footer class="bg-slate-900 text-slate-400 py-4 text-center text-xs">
-        <p>بوابة حساب المعدلات المحدثة 🔒 مطابقة بالكامل للموقع الرسمي وعمادات القبول</p>
+        <p>بوابة حساب المعدلات المحدثة 🔒 مزامنة سحابية فورية مطابقة للأنظمة الأكاديمية</p>
     </footer>
 
     <script>
-        // تحديث مصفوفة نظام الـ 5 نقاط بناءً على تقسيم الدرجات والرموز الجديد المطلوب
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const dbRef = database.ref('shared_gpa_data');
+
         const grades5 = [
             {text: 'A+ / من 95 إلى 100 (5.00)', val: '5.00'}, 
             {text: 'A / من 90 إلى 94 (4.75)', val: '4.75'}, 
@@ -162,7 +177,6 @@
             {text: 'F / أقل من 60 (0.00)', val: '0.00'}
         ];
 
-        // تحديث مصفوفة نظام الـ 4 نقاط بالتوافق مع النطاقات الجديدة المحددة
         const grades4 = [
             {text: 'A+ / من 95 إلى 100 (4.00)', val: '4.00'}, 
             {text: 'A / من 90 إلى 94 (3.75)', val: '3.75'}, 
@@ -176,7 +190,8 @@
         ];
 
         function getSystem() {
-            return document.querySelector('input[name="gpa_system"]:checked').value;
+            const checkedRadio = document.querySelector('input[name="gpa_system"]:checked');
+            return checkedRadio ? checkedRadio.value : '5';
         }
 
         function handleLoginSubmit() {
@@ -187,13 +202,11 @@
             localStorage.setItem('student_profile', JSON.stringify({name, uni}));
             document.getElementById('login-overlay').classList.add('hidden-force');
             displayWelcomeBanner();
-            saveData();
         }
 
         function handleLogout() {
-            if (confirm("هل تريد مسح البيانات المسجلة محلياً؟")) {
+            if (confirm("هل تريد تسجيل الخروج ومسح بياناتك الشخصية من هذا المتصفح؟")) {
                 localStorage.removeItem('student_profile');
-                localStorage.removeItem('gpa_v3_permanent');
                 window.location.reload();
             }
         }
@@ -206,7 +219,11 @@
             }
         }
 
-        function saveData() {
+        let isSyncing = false; 
+        
+        function saveDataToServer() {
+            if (isSyncing) return;
+            
             const data = {
                 system: getSystem(),
                 prevGpa: document.getElementById('prev-gpa').value,
@@ -226,39 +243,42 @@
                 });
             });
 
-            localStorage.setItem('gpa_v3_permanent', JSON.stringify(data));
+            dbRef.set(data);
         }
 
-        function checkLoginAndLoad() {
+        function checkLogin() {
             const profileExists = localStorage.getItem('student_profile');
             const overlay = document.getElementById('login-overlay');
-            
             if (!profileExists) {
                 overlay.classList.remove('hidden-force');
             } else {
                 overlay.classList.add('hidden-force');
                 displayWelcomeBanner();
             }
+        }
 
-            const rawData = localStorage.getItem('gpa_v3_permanent');
-            if (!rawData) {
+        dbRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (!data) {
+                checkLogin();
                 addCourseRow();
                 return;
             }
-            const data = JSON.parse(rawData);
-            
+
+            isSyncing = true; 
+
             document.querySelectorAll('input[name="gpa_system"]').forEach(el => {
                 el.checked = el.value === data.system;
             });
 
             document.getElementById('prev-gpa').value = data.prevGpa || '';
             document.getElementById('prev-hours').value = data.prevHours || '';
-            
             document.getElementById('gpa-result').innerText = data.resCumulativeGpa || '0.000';
             document.getElementById('term-gpa').innerText = data.resTermGpa || '0.000';
             document.getElementById('total-hours').innerText = data.resTotalHours || '0';
             document.getElementById('gpa-status').innerText = data.resStatus || '-';
 
+            // إعادة بناء قائمة المواد بشكل متطابق
             const list = document.getElementById('courses-list');
             list.innerHTML = '';
 
@@ -267,7 +287,10 @@
             } else {
                 addCourseRow();
             }
-        }
+
+            checkLogin();
+            isSyncing = false; // إلغاء الحماية بعد انتهاء البناء التلقائي
+        });
 
         function addCourseRow(name='', grade='', hours='3') {
             const list = document.getElementById('courses-list');
@@ -285,18 +308,18 @@
 
             row.innerHTML = `
                 <div class="col-span-5 md:col-span-6">
-                    <input type="text" value="${name}" placeholder="مثال: اسم المقرر" oninput="saveData()" class="course-name w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500 font-medium">
+                    <input type="text" value="${name}" placeholder="مثال: اسم المقرر" oninput="saveDataToServer()" class="course-name w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500 font-medium">
                 </div>
                 <div class="col-span-4 md:col-span-3">
-                    <select onchange="saveData()" class="course-grade w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-indigo-500 font-medium">
+                    <select onchange="saveDataToServer()" class="course-grade w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-indigo-500 font-medium">
                         ${optionsHTML}
                     </select>
                 </div>
                 <div class="col-span-2 md:col-span-2">
-                    <input type="number" value="${hours}" min="1" max="8" oninput="saveData()" class="course-hours w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:border-indigo-500 font-bold">
+                    <input type="number" value="${hours}" min="1" max="8" oninput="saveDataToServer()" class="course-hours w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:border-indigo-500 font-bold">
                 </div>
                 <div class="col-span-1 text-center">
-                    <button onclick="this.closest('.course-row').remove(); saveData();" class="text-rose-400 hover:text-rose-600 font-bold text-base transition cursor-pointer">&times;</button>
+                    <button onclick="this.closest('.course-row').remove(); saveDataToServer();" class="text-rose-400 hover:text-rose-600 font-bold text-base transition cursor-pointer">&times;</button>
                 </div>
             `;
             list.appendChild(row);
@@ -316,19 +339,17 @@
                     select.appendChild(opt);
                 });
             });
-            saveData();
+            saveDataToServer();
         }
 
-        window.onload = () => { checkLoginAndLoad(); };
-        
-        function savePythonResults() {
-            saveData();
+        function triggerServerUpdateFromPython() {
+            saveDataToServer();
         }
     </script>
 
     <script type="py">
         from pyscript import document
-        from js import savePythonResults
+        from js import triggerServerUpdateFromPython
 
         def python_calculate(event):
             system_elements = document.querySelectorAll('input[name="gpa_system"]')
@@ -385,7 +406,8 @@
             document.getElementById('total-hours').innerText = str(grand_total_hours)
             document.getElementById('gpa-status').innerText = status
             
-            savePythonResults()
+            # استدعاء دالة جافاسكريبت لرفع نتائج الحساب إلى السيرفر فوراً ليرى الجميع النتائج النهائية
+            triggerServerUpdateFromPython()
     </script>
 
 </body>
