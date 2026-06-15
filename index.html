@@ -15,15 +15,6 @@
     <style>
         body { font-family: 'Tajawal', sans-serif; }
         .hidden-force { display: none !important; }
-        
-        input[type="number"] {
-            font-variant-numeric: lining-nums !important;
-            -webkit-font-feature-settings: "lnum" !important;
-            font-feature-settings: "lnum" !important;
-            direction: ltr !important;
-            text-align: right;
-            padding-left: 8px;
-        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
@@ -36,7 +27,7 @@
             
             <div class="space-y-4 text-right mb-6">
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">اسمك :</label>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">اسمك الأكاديمي:</label>
                     <input type="text" id="user-name" placeholder="مثال: أحمد عبد الله" class="w-full border border-slate-200 bg-slate-50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 font-medium">
                 </div>
                 <div>
@@ -45,7 +36,7 @@
                 </div>
             </div>
             <button onclick="handleLoginSubmit()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md transition duration-200">
-                الدخول للمنصة الذكية 
+                الدخول للمنصة الذكية 🚀
             </button>
         </div>
     </div>
@@ -280,7 +271,7 @@
 
             row.innerHTML = `
                 <div class="col-span-5 md:col-span-6">
-                    <input type="text" value="${name}" placeholder="" oninput="saveData()" class="course-name w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500 font-medium">
+                    <input type="text" value="${name}" placeholder="مثال: رياضيات" oninput="saveData()" class="course-name w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500 font-medium">
                 </div>
                 <div class="col-span-4 md:col-span-3">
                     <select onchange="saveData()" class="course-grade w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-indigo-500 font-medium">
@@ -361,6 +352,7 @@
             final_cumulative_gpa = (grand_total_points / grand_total_hours) if grand_total_hours > 0 else 0.0
 
             status = "-"
+            # 📌 تطبيق شروط التصنيف المدخلة بدقة هندسية
             if gpa_system == 5:
                 if final_cumulative_gpa >= 4.75: status = "ممتاز مرتفع 🌟"
                 elif final_cumulative_gpa >= 4.50: status = "ممتاز 👍"
@@ -368,7 +360,7 @@
                 elif final_cumulative_gpa >= 2.75: status = "جيد"
                 elif final_cumulative_gpa >= 2.00: status = "مقبول"
                 else: status = "ضعيف 🔍"
-            else: 
+            else: # نظام الـ 4 نقاط
                 if final_cumulative_gpa >= 3.75: status = "ممتاز مرتفع 🌟"
                 elif final_cumulative_gpa >= 3.50: status = "ممتاز 👍"
                 elif final_cumulative_gpa >= 2.75: status = "جيد جداً"
