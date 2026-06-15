@@ -64,11 +64,11 @@
         <div class="flex justify-center gap-4 mb-8">
             <label class="flex items-center gap-3 bg-white px-6 py-3.5 rounded-2xl shadow-xs border border-slate-200 cursor-pointer hover:border-indigo-500 transition-all">
                 <input type="radio" name="gpa_system" value="5" checked onchange="onSystemChange()" class="w-4 h-4 text-indigo-600">
-                <span class="font-bold text-slate-700 text-sm">نظام الـ 5.00 نقاط</span>
+                <span class="font-bold text-slate-700 text-sm">نظام الـ 5.000 نقاط</span>
             </label>
             <label class="flex items-center gap-3 bg-white px-6 py-3.5 rounded-2xl shadow-xs border border-slate-200 cursor-pointer hover:border-indigo-500 transition-all">
                 <input type="radio" name="gpa_system" value="4" onchange="onSystemChange()" class="w-4 h-4 text-indigo-600">
-                <span class="font-bold text-slate-700 text-sm">نظام الـ 4.00 نقاط</span>
+                <span class="font-bold text-slate-700 text-sm">نظام الـ 4.000 نقاط</span>
             </label>
         </div>
 
@@ -82,7 +82,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1.5">المعدل التراكمي السابق:</label>
-                            <input type="number" id="prev-gpa" step="0.01" min="0" max="5" placeholder="0.00" oninput="saveData()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 font-bold">
+                            <input type="number" id="prev-gpa" step="0.001" min="0" max="5" placeholder="0.000" oninput="saveData()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 font-bold">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1.5">إجمالي الساعات المقطوعة سابقاً:</label>
@@ -122,14 +122,14 @@
                 <div class="w-full">
                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">المعدل التراكمي النهائي</h3>
                     <div class="inline-flex items-center justify-center w-36 h-36 rounded-full bg-indigo-50/70 border-4 border-indigo-500 text-slate-800 mb-4 shadow-xs">
-                        <span id="gpa-result" class="text-4xl font-black text-indigo-600">0.00</span>
+                        <span id="gpa-result" class="text-3xl font-black text-indigo-600">0.000</span>
                     </div>
                 </div>
                 
                 <div class="w-full bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs text-slate-600 space-y-2.5 text-right">
                     <div class="flex justify-between">
                         <span>المعدل الفصلي الحالي:</span>
-                        <span id="term-gpa" class="font-bold text-slate-800 text-sm">0.00</span>
+                        <span id="term-gpa" class="font-bold text-slate-800 text-sm">0.000</span>
                     </div>
                     <div class="flex justify-between">
                         <span>إجمالي الساعات الكلي:</span>
@@ -252,8 +252,9 @@
             document.getElementById('prev-gpa').value = data.prevGpa || '';
             document.getElementById('prev-hours').value = data.prevHours || '';
             
-            document.getElementById('gpa-result').innerText = data.resCumulativeGpa || '0.00';
-            document.getElementById('term-gpa').innerText = data.resTermGpa || '0.00';
+            // تم تعديل القيم المسترجعة الافتراضية هنا لتناسب الـ 3 خانات
+            document.getElementById('gpa-result').innerText = data.resCumulativeGpa || '0.000';
+            document.getElementById('term-gpa').innerText = data.resTermGpa || '0.000';
             document.getElementById('total-hours').innerText = data.resTotalHours || '0';
             document.getElementById('gpa-status').innerText = data.resStatus || '-';
 
@@ -364,7 +365,6 @@
             final_cumulative_gpa = (grand_total_points / grand_total_hours) if grand_total_hours > 0 else 0.0
 
             status = "-"
-            # 📌 تطبيق شروط التصنيف المدخلة بدقة هندسية
             if gpa_system == 5:
                 if final_cumulative_gpa >= 4.75: status = "ممتاز مرتفع 🌟"
                 elif final_cumulative_gpa >= 4.50: status = "ممتاز 👍"
@@ -372,7 +372,7 @@
                 elif final_cumulative_gpa >= 2.75: status = "جيد"
                 elif final_cumulative_gpa >= 2.00: status = "مقبول"
                 else: status = "ضعيف 🔍"
-            else: # نظام الـ 4 نقاط
+            else: 
                 if final_cumulative_gpa >= 3.75: status = "ممتاز مرتفع 🌟"
                 elif final_cumulative_gpa >= 3.50: status = "ممتاز 👍"
                 elif final_cumulative_gpa >= 2.75: status = "جيد جداً"
@@ -380,8 +380,9 @@
                 elif final_cumulative_gpa >= 1.00: status = "مقبول"
                 else: status = "ضعيف 🔍"
 
-            document.getElementById('gpa-result').innerText = f"{final_cumulative_gpa:.2f}"
-            document.getElementById('term-gpa').innerText = f"{current_term_gpa:.2f}"
+            # 📌 التحديث الجوهري هنا: تغيير الصياغة النصية للبايثون إلى f"{...:.3f}" لضمان الدقة الكاملة بـ 3 خانات
+            document.getElementById('gpa-result').innerText = f"{final_cumulative_gpa:.3f}"
+            document.getElementById('term-gpa').innerText = f"{current_term_gpa:.3f}"
             document.getElementById('total-hours').innerText = str(grand_total_hours)
             document.getElementById('gpa-status').innerText = status
             
@@ -389,4 +390,4 @@
     </script>
 
 </body>
-</html>    
+</html>
